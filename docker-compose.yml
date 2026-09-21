@@ -1,8 +1,8 @@
 # No reverse proxy or auth — deployment responsibility, not app's.
 services:
   app:
-    image: ghcr.io/<owner>/<app-name>:latest
-    container_name: <app-name>
+    image: ghcr.io/cdcaskey/time-since:latest
+    container_name: time-since
     restart: unless-stopped
 
     environment:
@@ -12,8 +12,8 @@ services:
       CONFIG_DIR: /config
 
     volumes:
-      # Mount the whole dir, not just app.db — SQLite's WAL mode adds
-      # app.db-wal and app.db-shm alongside it.
+      # Mount the whole dir, not just time-since.db — SQLite's WAL mode
+      # adds time-since.db-wal and time-since.db-shm alongside it.
       - ./data:/data
       - ./config:/config
 

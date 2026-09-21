@@ -1,5 +1,5 @@
 {
-  "name": "spa-template",
+  "name": "time-since",
   "private": true,
   "version": "0.1.0",
   "type": "module",
@@ -7,9 +7,9 @@
     "node": ">=24 <25"
   },
   "scripts": {
-    "dev": "concurrently -n vite,api -c cyan,magenta \"vite\" \"cross-env PORT=3001 DATA_DIR=./data CONFIG_DIR=./config tsx watch server/index.ts\"",
+    "dev": "concurrently -n vite,api -c cyan,magenta \"vite\" \"cross-env PORT=3001 DATA_DIR=./data/dev CONFIG_DIR=./config tsx watch server/index.ts\"",
     "build": "vite build && tsc -p server/tsconfig.json",
-    "postbuild": "node -e \"require('fs').cpSync('server/migrations','server/dist/server/migrations',{recursive:true})\"",
+    "postbuild": "node scripts/postbuild.mjs",
     "start": "node server/dist/server/index.js",
     "migrate": "tsx server/migrate.ts",
     "typecheck": "tsc --noEmit && tsc -p server/tsconfig.json --noEmit",
@@ -22,12 +22,16 @@
   "dependencies": {
     "@fastify/static": "^10.1.4",
     "@mantine/core": "^9.6.1",
+    "@mantine/form": "^9.6.1",
     "@mantine/hooks": "^9.6.1",
+    "@mantine/notifications": "^9.6.1",
+    "@tanstack/react-query": "^5.90.5",
     "better-sqlite3": "^13.0.3",
     "dotenv": "^18.0.1",
     "fastify": "^5.12.5",
     "react": "^19.3.0",
-    "react-dom": "^19.3.0"
+    "react-dom": "^19.3.0",
+    "zod": "^4.1.13"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
@@ -45,11 +49,14 @@
     "cross-env": "^10.1.0",
     "eslint": "^10.11.0",
     "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "eslint-plugin-react-refresh": "^0.5.7",
     "globals": "^17.12.0",
     "jsdom": "^30.1.0",
     "prettier": "^3.9.8",
     "tsx": "^4.23.15",
-    "typescript": "^7.0.2",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.70.0",
     "vite": "^8.3.0",
     "vitest": "^5.0.1"
   }

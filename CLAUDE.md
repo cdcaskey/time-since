@@ -17,11 +17,10 @@
 - `npm run migrate` — apply pending migrations standalone, without
   starting the server
 - `npm run typecheck` — typecheck both frontend and server configs
-- `npm run lint` / `npm run format` — ESLint / Prettier. ESLint only
-  covers plain `.js`/`.mjs` config files for now — `typescript-eslint`
-  hard-blocks TypeScript 7 (which this template pins) at runtime, not
-  just an unbumped peer range. `.ts`/`.tsx` files rely on `typecheck`
-  for now; revisit once
+- `npm run lint` / `npm run format` — ESLint / Prettier. TypeScript is
+  held at `^6.0.3` (not the `^7` this template originally pinned) so
+  that `typescript-eslint` — which hard-blocks TS7 at runtime — can
+  lint `.ts`/`.tsx` files. Revisit once
   https://github.com/typescript-eslint/typescript-eslint/issues/10940
   ships TS7 support.
 

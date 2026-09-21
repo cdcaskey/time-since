@@ -6,7 +6,7 @@ const DATA_DIR = process.env.DATA_DIR ?? '/data';
 
 fs.mkdirSync(DATA_DIR, { recursive: true });
 
-export const dbPath = path.join(DATA_DIR, 'app.db');
+export const dbPath = path.join(DATA_DIR, 'time-since.db');
 
 export const db = new Database(dbPath);
 
