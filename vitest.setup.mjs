@@ -1,4 +1,11 @@
+import { afterEach } from 'vitest';
+import { cleanup } from '@testing-library/react';
 import '@testing-library/jest-dom/vitest';
+
+// vite.config.ts doesn't set test.globals, so @testing-library/react's own
+// auto-cleanup (which looks for a global afterEach) never registers —
+// without this, DOM from one test leaks into the next within a file.
+afterEach(cleanup);
 
 // Mantine components probe these DOM APIs on mount; jsdom doesn't
 // implement them, so component tests hang or throw without stubs.
