@@ -1,0 +1,8 @@
+node_modules
+dist
+server/dist
+data
+config
+.git
+.github
+*.md

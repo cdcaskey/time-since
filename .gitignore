@@ -1,0 +1,103 @@
+# Dependencies
+node_modules/
+.pnp/
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/releases
+!.yarn/plugins
+!.yarn/versions
+
+# Build output
+dist/
+dist-ssr/
+build/
+server/dist/
+*.tsbuildinfo
+
+# Runtime state (mounted volumes locally)
+data/
+config/
+
+# SQLite (if stored outside of the ignored directories)
+*.db
+*.db-journal
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+
+# Environment and secrets
+.env
+.env.*
+!config-defaults/.env
+!config-defaults/.env.*
+*.pem
+*.key
+
+# Logs
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Caches/tool states
+.cache/
+.npm/
+.vite/
+node_modules/.vite/
+.eslintcache
+.stylelintcache
+coverage/
+*.lcov
+.nyc_output/
+test-results/
+playwright-report/
+
+# VS Code
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+!.vscode/launch.json
+!.vscode/tasks.json
+.history/
+*.code-workspace
+
+# JetBrains
+.idea/
+*.iml
+*.ipr
+*.iws
+out/
+
+# macOS
+.DS_Store
+.DS_Store?
+._*
+.AppleDouble
+.LSOverride
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.fseventsd
+.VolumeIcon.icns
+.DocumentRevisions-V100
+Icon?
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+desktop.ini
+$RECYCLE.BIN/
+*.stackdump
+*.lnk
+
+# Linux
+.directory
+.Trash-*
+.nfs*

@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#228be6" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23228be6%22/></svg>"
+    />
+    <title>SPA Template</title>
+    <!--
+      Equivalent to Mantine's <ColorSchemeScript defaultColorScheme="auto" />
+      inlined by hand: this is a plain CSR app with no server-side render
+      step to emit that component from, and it must run before first paint
+      to avoid a flash of the wrong color scheme.
+    -->
+    <script>
+      try {
+        var _colorScheme = window.localStorage.getItem('mantine-color-scheme-value');
+        var colorScheme =
+          _colorScheme === 'light' || _colorScheme === 'dark' || _colorScheme === 'auto'
+            ? _colorScheme
+            : 'auto';
+        var computedColorScheme =
+          colorScheme !== 'auto'
+            ? colorScheme
+            : window.matchMedia('(prefers-color-scheme: dark)').matches
+              ? 'dark'
+              : 'light';
+        document.documentElement.setAttribute('data-mantine-color-scheme', computedColorScheme);
+      } catch (e) {}
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
