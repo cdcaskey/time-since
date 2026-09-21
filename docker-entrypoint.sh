@@ -11,8 +11,11 @@ mkdir -p "$CONFIG_DIR" "$DATA_DIR"
 # Seed default config files into CONFIG_DIR, but only where nothing
 # already exists — user overrides on the host always win, and later
 # image updates can add new default files without clobbering edits.
-if [ -d /app/config-defaults ] && [ -n "$(ls -A /app/config-defaults 2>/dev/null)" ]; then
-  for f in /app/config-defaults/*; do
+# find (not a `*` glob) so dotfiles like config-defaults/.env are included —
+# a bare `*` glob skips them, and `ls -A`-then-`for f in *` (the previous
+# form here) silently no-ops in exactly that case.
+if [ -d /app/config-defaults ]; then
+  find /app/config-defaults -mindepth 1 -maxdepth 1 | while read -r f; do
     name=$(basename "$f")
     [ -e "$CONFIG_DIR/$name" ] || cp "$f" "$CONFIG_DIR/$name"
   done

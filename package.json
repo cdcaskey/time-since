@@ -12,6 +12,7 @@
     "postbuild": "node scripts/postbuild.mjs",
     "start": "node server/dist/server/index.js",
     "migrate": "tsx server/migrate.ts",
+    "seed": "cross-env DATA_DIR=./data/dev tsx server/seed.ts",
     "typecheck": "tsc --noEmit && tsc -p server/tsconfig.json --noEmit",
     "lint": "eslint .",
     "format": "prettier --write .",
