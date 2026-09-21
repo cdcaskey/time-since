@@ -3,7 +3,12 @@
 FROM node:24-alpine AS build
 WORKDIR /app
 COPY package*.json ./
-RUN npm ci
+# better-sqlite3 ships prebuilt bindings and doesn't need its install script
+# (node-gyp rebuild) to run at all — but npm runs it unconditionally, and it
+# fails here with no compiler toolchain installed. esbuild's postinstall
+# *does* need to run (it downloads vite's platform binary), so skip scripts
+# globally and then re-run just that one.
+RUN npm ci --ignore-scripts && npm rebuild esbuild
 COPY . .
 RUN npm run build
 
@@ -16,7 +21,9 @@ WORKDIR /app
 COPY --from=build /app/package*.json ./
 # Fresh production-only install rather than copying node_modules from the
 # build stage — keeps dev dependencies out of the runtime image entirely.
-RUN npm ci --omit=dev
+# --ignore-scripts for the same reason as the build stage; nothing else in
+# the production dependency set needs an install script.
+RUN npm ci --omit=dev --ignore-scripts
 
 # better-sqlite3 ships prebuilt bindings for linuxmusl; fail the build
 # here instead of at the first request if that ever stops being true.
@@ -27,7 +34,11 @@ COPY --from=build /app/server/dist ./server/dist
 COPY config-defaults ./config-defaults
 COPY docker-entrypoint.sh /usr/local/bin/
 
+# The base image predefines a "node" user at uid/gid 1000; drop it so our
+# own "app" user (the one docker-entrypoint.sh's PUID/PGID remap targets)
+# can claim that uid/gid instead.
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh \
+    && deluser node \
     && addgroup -g 1000 app \
     && adduser -D -u 1000 -G app app
 
