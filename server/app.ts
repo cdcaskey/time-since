@@ -2,14 +2,31 @@ import fs from 'node:fs';
 import Fastify, { type FastifyInstance } from 'fastify';
 import fastifyStatic from '@fastify/static';
 import { checkDb } from './db.js';
+import { registerTaskRoutes } from './routes/tasks.js';
+import { HttpError } from './http-errors.js';
 
 export function buildApp(distDir: string): FastifyInstance {
-  const app = Fastify({ logger: { level: process.env.LOG_LEVEL ?? 'info' } });
+  const app = Fastify({
+    logger: { level: process.env.LOG_LEVEL ?? 'info' },
+    trustProxy: true,
+  });
+
+  app.setErrorHandler((err, _req, reply) => {
+    if (err instanceof HttpError) {
+      reply.code(err.statusCode).send({ error: { message: err.message, field: err.field } });
+      return;
+    }
+
+    app.log.error(err);
+    reply.code(500).send({ error: { message: 'internal server error' } });
+  });
 
   app.get('/api/health', async (_req, reply) => {
     const dbOk = checkDb();
     reply.code(dbOk ? 200 : 503).send({ status: dbOk ? 'ok' : 'error', db: dbOk ? 'ok' : 'error' });
   });
+
+  registerTaskRoutes(app);
 
   // Dist only exists after build; in dev Vite serves directly.
   if (fs.existsSync(distDir)) {
@@ -20,7 +37,7 @@ export function buildApp(distDir: string): FastifyInstance {
 
     app.setNotFoundHandler((req, reply) => {
       if (req.raw.url?.startsWith('/api/')) {
-        reply.code(404).send({ error: 'not found' });
+        reply.code(404).send({ error: { message: 'not found' } });
         return;
       }
       reply.sendFile('index.html');
