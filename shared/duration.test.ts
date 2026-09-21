@@ -3,6 +3,7 @@ import {
   DURATION_UNITS,
   formatElapsed,
   fromSeconds,
+  secondsToUnitValue,
   SECONDS_PER_UNIT,
   toSeconds,
 } from './duration.js';
@@ -37,6 +38,24 @@ describe('unit conversion', () => {
       const value = fromSeconds(seconds, unit);
       expect(toSeconds(value, unit)).toBe(seconds);
     }
+  });
+});
+
+describe('secondsToUnitValue', () => {
+  it('picks the largest unit that divides evenly', () => {
+    expect(secondsToUnitValue(toSeconds(2, 'weeks'))).toEqual({ value: 2, unit: 'weeks' });
+    expect(secondsToUnitValue(toSeconds(3, 'months'))).toEqual({ value: 3, unit: 'months' });
+    expect(secondsToUnitValue(toSeconds(90, 'minutes'))).toEqual({ value: 90, unit: 'minutes' });
+  });
+
+  it('does not report a fractional value in a larger unit', () => {
+    // 90 minutes is 1.5 hours — hours would be wrong (fractional), so this
+    // must fall through to minutes, which divides evenly.
+    expect(secondsToUnitValue(5400)).toEqual({ value: 90, unit: 'minutes' });
+  });
+
+  it('falls back to fractional minutes when nothing divides evenly', () => {
+    expect(secondsToUnitValue(90)).toEqual({ value: 1.5, unit: 'minutes' });
   });
 });
 

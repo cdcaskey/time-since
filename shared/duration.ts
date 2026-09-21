@@ -21,6 +21,23 @@ export function fromSeconds(seconds: number, unit: DurationUnit): number {
   return seconds / SECONDS_PER_UNIT[unit];
 }
 
+const DISPLAY_UNIT_ORDER: DurationUnit[] = ['months', 'weeks', 'days', 'hours', 'minutes'];
+
+// Picks the largest unit that divides the seconds evenly, so editing a task
+// created with "2 weeks" shows "2 weeks" back rather than "1209600 seconds"
+// or a fraction. Falls back to (fractional) minutes if nothing divides
+// evenly, which only happens for values no form on this unit list could
+// have produced in the first place.
+export function secondsToUnitValue(seconds: number): { value: number; unit: DurationUnit } {
+  for (const unit of DISPLAY_UNIT_ORDER) {
+    const value = seconds / SECONDS_PER_UNIT[unit];
+    if (Number.isInteger(value) && value >= 1) {
+      return { value, unit };
+    }
+  }
+  return { value: seconds / SECONDS_PER_UNIT.minutes, unit: 'minutes' };
+}
+
 const ELAPSED_UNITS: { label: string; seconds: number }[] = [
   { label: 'year', seconds: 365 * 24 * 60 * 60 },
   { label: 'month', seconds: 30 * 24 * 60 * 60 },
