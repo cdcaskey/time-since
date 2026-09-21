@@ -30,9 +30,10 @@ interface TaskCardProps {
   score: number;
   band: Band;
   now: number;
+  onEdit: (task: TaskDto) => void;
 }
 
-export function TaskCard({ task, score, band, now }: TaskCardProps) {
+export function TaskCard({ task, score, band, now, onEdit }: TaskCardProps) {
   const [deleteOpen, setDeleteOpen] = useState(false);
   const completeMutation = useCompleteTaskMutation();
   const undoMutation = useUndoCompletionMutation();
@@ -103,6 +104,7 @@ export function TaskCard({ task, score, band, now }: TaskCardProps) {
                 </Menu.Target>
               </Popover.Target>
               <Menu.Dropdown>
+                <Menu.Item onClick={() => onEdit(task)}>Edit</Menu.Item>
                 <Menu.Item color="red" onClick={() => setDeleteOpen(true)}>
                   Delete
                 </Menu.Item>

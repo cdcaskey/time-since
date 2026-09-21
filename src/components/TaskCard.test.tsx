@@ -39,7 +39,9 @@ const task: TaskDto = {
 describe('TaskCard done/undo flow', () => {
   it('records a completion when Done is clicked and shows an Undo toast', async () => {
     const user = userEvent.setup();
-    renderWithProviders(<TaskCard task={task} score={1.5} band="due" now={2000} />);
+    renderWithProviders(
+      <TaskCard task={task} score={1.5} band="due" now={2000} onEdit={vi.fn()} />,
+    );
 
     await user.click(screen.getByRole('button', { name: 'Done' }));
 
@@ -59,10 +61,25 @@ describe('TaskCard done/undo flow', () => {
   });
 });
 
+describe('TaskCard edit flow', () => {
+  it('calls onEdit with the task when Edit is clicked', async () => {
+    const user = userEvent.setup();
+    const onEdit = vi.fn();
+    renderWithProviders(<TaskCard task={task} score={1.5} band="due" now={2000} onEdit={onEdit} />);
+
+    await user.click(screen.getByRole('button', { name: 'Task actions' }));
+    await user.click(await screen.findByRole('menuitem', { name: 'Edit' }));
+
+    expect(onEdit).toHaveBeenCalledWith(task);
+  });
+});
+
 describe('TaskCard delete flow', () => {
   it('requires confirmation before deleting', async () => {
     const user = userEvent.setup();
-    renderWithProviders(<TaskCard task={task} score={1.5} band="due" now={2000} />);
+    renderWithProviders(
+      <TaskCard task={task} score={1.5} band="due" now={2000} onEdit={vi.fn()} />,
+    );
 
     await user.click(screen.getByRole('button', { name: 'Task actions' }));
     await user.click(await screen.findByRole('menuitem', { name: 'Delete' }));
@@ -82,7 +99,7 @@ describe('TaskCard delete flow', () => {
 
 describe('TaskCard never-completed badge', () => {
   it('shows a "Never done" badge instead of a relative time', () => {
-    renderWithProviders(<TaskCard task={task} score={0.5} band="ok" now={2000} />);
+    renderWithProviders(<TaskCard task={task} score={0.5} band="ok" now={2000} onEdit={vi.fn()} />);
     expect(screen.getByText('Never done')).toBeInTheDocument();
   });
 });

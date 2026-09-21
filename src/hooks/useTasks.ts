@@ -1,10 +1,13 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import type { CreateTaskInput, UpdateTaskInput } from '@shared/schemas';
 import type { TaskDto } from '@shared/types';
 import {
   createCompletionRequest,
+  createTaskRequest,
   deleteCompletionRequest,
   deleteTaskRequest,
   fetchTasks,
+  updateTaskRequest,
 } from '../api/client';
 
 export const tasksQueryKey = ['tasks'] as const;
@@ -60,6 +63,29 @@ export function useUndoCompletionMutation() {
   return useMutation({
     mutationFn: (completionId: string) => deleteCompletionRequest(completionId),
     onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: tasksQueryKey });
+    },
+  });
+}
+
+export function useCreateTaskMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (input: CreateTaskInput) => createTaskRequest(input),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: tasksQueryKey });
+    },
+  });
+}
+
+export function useUpdateTaskMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, input }: { id: string; input: UpdateTaskInput }) =>
+      updateTaskRequest(id, input),
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: tasksQueryKey });
     },
   });
