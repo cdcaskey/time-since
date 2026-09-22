@@ -1,5 +1,5 @@
 import type { Band } from '@shared/urgency';
-import { IconAlertOctagon, IconAlertTriangle, IconCheck, IconClock } from './icons';
+import { Check, Clock, Warning, WarningOctagon } from '@phosphor-icons/react';
 
 // Band communicated by label + icon, never by color alone (§8).
 export const bandLabel: Record<Band, string> = {
@@ -9,9 +9,9 @@ export const bandLabel: Record<Band, string> = {
   ok: 'OK',
 };
 
-export const bandIcon: Record<Band, typeof IconCheck> = {
-  urgent: IconAlertOctagon,
-  overdue: IconAlertTriangle,
-  due: IconClock,
-  ok: IconCheck,
+export const bandIcon: Record<Band, typeof Check> = {
+  urgent: WarningOctagon,
+  overdue: Warning,
+  due: Clock,
+  ok: Check,
 };

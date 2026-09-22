@@ -18,7 +18,7 @@ import type { Band } from '@shared/urgency';
 import { formatElapsed } from '@shared/duration';
 import { bandColor } from '../theme';
 import { bandLabel } from '../bandMeta';
-import { IconDots } from '../icons';
+import { DotsThree } from '@phosphor-icons/react';
 import {
   useCompleteTaskMutation,
   useDeleteTaskMutation,
@@ -99,7 +99,7 @@ export function TaskCard({ task, score, band, now, onEdit }: TaskCardProps) {
               <Popover.Target>
                 <Menu.Target>
                   <ActionIcon variant="subtle" color="gray" aria-label="Task actions">
-                    <IconDots size={18} />
+                    <DotsThree size={18} weight="bold" />
                   </ActionIcon>
                 </Menu.Target>
               </Popover.Target>
