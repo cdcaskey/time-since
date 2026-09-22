@@ -6,6 +6,7 @@ import { Notifications } from '@mantine/notifications';
 import '@mantine/core/styles.css';
 import '@mantine/notifications/styles.css';
 import { theme } from './theme';
+import { inMemoryColorSchemeManager } from './colorSchemeManager';
 import { App } from './App';
 
 const queryClient = new QueryClient();
@@ -13,7 +14,11 @@ const queryClient = new QueryClient();
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
-      <MantineProvider theme={theme} defaultColorScheme="auto">
+      <MantineProvider
+        theme={theme}
+        defaultColorScheme="auto"
+        colorSchemeManager={inMemoryColorSchemeManager()}
+      >
         <Notifications />
         <App />
       </MantineProvider>
