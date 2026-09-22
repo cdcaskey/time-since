@@ -8,7 +8,7 @@ import { BandSection } from './BandSection';
 import { TaskCard } from './TaskCard';
 import { TaskFormModal } from './TaskFormModal';
 import { AddTaskButton } from './AddTaskButton';
-import { IconSearch } from '../icons';
+import { MagnifyingGlass } from '@phosphor-icons/react';
 
 const NOW_INTERVAL_MS = 30_000;
 
@@ -85,7 +85,7 @@ export function TaskListView() {
         <TextInput
           placeholder="Search tasks"
           aria-label="Search tasks"
-          leftSection={<IconSearch size={16} />}
+          leftSection={<MagnifyingGlass size={16} />}
           value={search}
           onChange={(e) => setSearch(e.currentTarget.value)}
         />
