@@ -13,21 +13,17 @@
       Equivalent to Mantine's <ColorSchemeScript defaultColorScheme="auto" />
       inlined by hand: this is a plain CSR app with no server-side render
       step to emit that component from, and it must run before first paint
-      to avoid a flash of the wrong color scheme.
+      to avoid a flash of the wrong color scheme. Color scheme always
+      defaults to the OS preference and is never persisted (see
+      src/colorSchemeManager.ts), so this ignores localStorage entirely
+      and clears any value left over from before that was true.
     -->
     <script>
       try {
-        var _colorScheme = window.localStorage.getItem('mantine-color-scheme-value');
-        var colorScheme =
-          _colorScheme === 'light' || _colorScheme === 'dark' || _colorScheme === 'auto'
-            ? _colorScheme
-            : 'auto';
-        var computedColorScheme =
-          colorScheme !== 'auto'
-            ? colorScheme
-            : window.matchMedia('(prefers-color-scheme: dark)').matches
-              ? 'dark'
-              : 'light';
+        window.localStorage.removeItem('mantine-color-scheme-value');
+        var computedColorScheme = window.matchMedia('(prefers-color-scheme: dark)').matches
+          ? 'dark'
+          : 'light';
         document.documentElement.setAttribute('data-mantine-color-scheme', computedColorScheme);
       } catch (e) {}
     </script>
