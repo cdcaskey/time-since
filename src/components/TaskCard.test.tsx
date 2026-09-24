@@ -33,6 +33,7 @@ const task: TaskDto = {
   createdAt: 1000,
   updatedAt: 1000,
   lastCompletedAt: null,
+  initialState: null,
   completionCount: 0,
 };
 

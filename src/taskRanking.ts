@@ -22,7 +22,15 @@ export function rankTasks(tasks: TaskDto[], now: number): RankedTask[] {
         urgentAfterSeconds: task.urgentAfterSeconds,
         now,
       });
-      return { task, score, band: bandForScore(score) };
+      const timeBand = bandForScore(score);
+      // A never-completed task's initialState is a floor under the time
+      // calculation, not an override of it: once real elapsed time carries
+      // the task past "ok" on its own, that natural band wins.
+      const band =
+        task.lastCompletedAt === null && timeBand === 'ok' && task.initialState !== null
+          ? task.initialState
+          : timeBand;
+      return { task, score, band };
     })
     .sort((a, b) => b.score - a.score || a.task.name.localeCompare(b.task.name));
 }

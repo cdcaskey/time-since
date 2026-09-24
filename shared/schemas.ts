@@ -1,6 +1,8 @@
 import { z } from 'zod';
+import type { Band } from './urgency.js';
 
 const positiveInt = z.number().int().positive();
+const bandSchema = z.enum(['ok', 'due', 'overdue', 'urgent']) satisfies z.ZodType<Band>;
 
 export interface ThresholdIssue {
   path: 'overdueAfterSeconds' | 'urgentAfterSeconds';
@@ -41,6 +43,7 @@ export const createTaskSchema = z
     dueAfterSeconds: positiveInt,
     overdueAfterSeconds: positiveInt,
     urgentAfterSeconds: positiveInt,
+    initialState: bandSchema.optional(),
   })
   .superRefine((value, ctx) => {
     for (const issue of thresholdOrderingIssues(value)) {

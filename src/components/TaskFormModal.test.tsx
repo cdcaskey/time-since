@@ -134,6 +134,7 @@ describe('TaskFormModal submit', () => {
       createdAt: 1000,
       updatedAt: 1000,
       lastCompletedAt: null,
+      initialState: null,
       completionCount: 0,
     };
 
@@ -153,6 +154,54 @@ describe('TaskFormModal submit', () => {
     expect(onClose).toHaveBeenCalled();
   });
 
+  it('sends initialState: "due" when "start already due" is checked', async () => {
+    const user = userEvent.setup();
+    const onClose = vi.fn();
+    renderWithProviders(<TaskFormModal opened onClose={onClose} />);
+
+    await user.type(screen.getByLabelText('Name', { exact: false }), 'Clean gutters');
+    await user.click(screen.getByRole('checkbox', { name: 'Start this task already due' }));
+    await user.click(screen.getByRole('button', { name: 'Create' }));
+
+    await waitFor(() => {
+      expect(createTaskRequest).toHaveBeenCalledWith(
+        expect.objectContaining({ name: 'Clean gutters', initialState: 'due' }),
+      );
+    });
+  });
+
+  it('omits initialState when "start already due" is left unchecked', async () => {
+    const user = userEvent.setup();
+    renderWithProviders(<TaskFormModal opened onClose={vi.fn()} />);
+
+    await user.type(screen.getByLabelText('Name', { exact: false }), 'Clean gutters');
+    await user.click(screen.getByRole('button', { name: 'Create' }));
+
+    await waitFor(() => {
+      expect(createTaskRequest).toHaveBeenCalled();
+    });
+    expect(createTaskRequest.mock.calls[0][0].initialState).toBeUndefined();
+  });
+
+  it('does not offer "start already due" when editing', () => {
+    const task: TaskDto = {
+      id: 'task-1',
+      name: 'Water plants',
+      description: '',
+      dueAfterSeconds: 7 * 86400,
+      overdueAfterSeconds: 14 * 86400,
+      urgentAfterSeconds: 28 * 86400,
+      createdAt: 1000,
+      updatedAt: 1000,
+      lastCompletedAt: null,
+      initialState: null,
+      completionCount: 0,
+    };
+    renderWithProviders(<TaskFormModal opened onClose={vi.fn()} task={task} />);
+
+    expect(screen.queryByRole('checkbox', { name: 'Start this task already due' })).toBeNull();
+  });
+
   it('does not auto-fill overdue/urgent from due when editing', async () => {
     const user = userEvent.setup();
     const task: TaskDto = {
@@ -165,6 +214,7 @@ describe('TaskFormModal submit', () => {
       createdAt: 1000,
       updatedAt: 1000,
       lastCompletedAt: null,
+      initialState: null,
       completionCount: 0,
     };
 

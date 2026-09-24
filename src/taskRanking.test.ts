@@ -16,6 +16,7 @@ function makeTask(overrides: Partial<TaskDto> = {}): TaskDto {
     createdAt: NOW - 10 * DAY,
     updatedAt: NOW - 10 * DAY,
     lastCompletedAt: null,
+    initialState: null,
     completionCount: 0,
     ...overrides,
   };
@@ -41,6 +42,34 @@ describe('rankTasks', () => {
 
     const ranked = rankTasks([high, tieA, tieB], NOW);
     expect(ranked.map((r) => r.task.name)).toEqual(['B', 'Apple', 'Zebra']);
+  });
+});
+
+describe('rankTasks initialState', () => {
+  it('applies initialState when never completed and the time calculation is still ok', () => {
+    const task = makeTask({ createdAt: NOW, lastCompletedAt: null, initialState: 'due' });
+    const [ranked] = rankTasks([task], NOW);
+    expect(ranked.band).toBe('due');
+  });
+
+  it('lets real elapsed time override initialState once it ages past ok', () => {
+    const task = makeTask({
+      createdAt: NOW - 100 * DAY,
+      lastCompletedAt: null,
+      initialState: 'due',
+    });
+    const [ranked] = rankTasks([task], NOW);
+    expect(ranked.band).toBe('urgent');
+  });
+
+  it('ignores initialState once the task has a completion history', () => {
+    const task = makeTask({
+      createdAt: NOW - 100 * DAY,
+      lastCompletedAt: NOW,
+      initialState: 'due',
+    });
+    const [ranked] = rankTasks([task], NOW);
+    expect(ranked.band).toBe('ok');
   });
 });
 

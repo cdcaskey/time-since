@@ -49,11 +49,17 @@ describe('createTask / getTask', () => {
 
     expect(created.name).toBe('Clean gutters');
     expect(created.lastCompletedAt).toBeNull();
+    expect(created.initialState).toBeNull();
     expect(created.completionCount).toBe(0);
     expect(created.createdAt).toBe(created.updatedAt);
 
     const fetched = repo.getTask(created.id);
     expect(fetched).toEqual(created);
+  });
+
+  it('stores an initialState override', () => {
+    const created = repo.createTask(makeTaskParams({ initialState: 'due' }));
+    expect(created.initialState).toBe('due');
   });
 
   it('returns undefined for an unknown id', () => {

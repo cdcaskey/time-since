@@ -31,6 +31,7 @@ function makeTask(overrides: Partial<TaskDto>): TaskDto {
     createdAt: NOW - 10 * DAY,
     updatedAt: NOW - 10 * DAY,
     lastCompletedAt: NOW - 10 * DAY,
+    initialState: null,
     completionCount: 1,
     ...overrides,
   };
