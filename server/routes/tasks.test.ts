@@ -69,6 +69,26 @@ describe('POST /api/tasks', () => {
     expect(typeof body.id).toBe('string');
   });
 
+  it('accepts an initialState override', async () => {
+    const res = await app.inject({
+      method: 'POST',
+      url: '/api/tasks',
+      payload: { ...validTaskBody, initialState: 'due' },
+    });
+    expect(res.statusCode).toBe(201);
+    expect(res.json().initialState).toBe('due');
+  });
+
+  it('rejects an invalid initialState, naming that field', async () => {
+    const res = await app.inject({
+      method: 'POST',
+      url: '/api/tasks',
+      payload: { ...validTaskBody, initialState: 'later' },
+    });
+    expect(res.statusCode).toBe(400);
+    expect(res.json().error.field).toBe('initialState');
+  });
+
   it('rejects a blank name with 400 naming the field', async () => {
     const res = await app.inject({
       method: 'POST',

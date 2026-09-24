@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import {
   Button,
+  Checkbox,
   Group,
   Modal,
   NumberInput,
@@ -155,6 +156,7 @@ function TaskFormFields({ task, onClose }: TaskFormFieldsProps) {
   // edit must never clobber them.
   const [overdueTouched, setOverdueTouched] = useState(isEdit);
   const [urgentTouched, setUrgentTouched] = useState(isEdit);
+  const [startDue, setStartDue] = useState(false);
 
   const form = useForm<TaskFormValues>({
     initialValues: defaultValues(task),
@@ -262,7 +264,7 @@ function TaskFormFields({ task, onClose }: TaskFormFieldsProps) {
     const promise =
       isEdit && task
         ? updateMutation.mutateAsync({ id: task.id, input })
-        : createMutation.mutateAsync(input);
+        : createMutation.mutateAsync(startDue ? { ...input, initialState: 'due' } : input);
 
     promise
       .then(() => onClose())
@@ -329,6 +331,14 @@ function TaskFormFields({ task, onClose }: TaskFormFieldsProps) {
         <Text size="xs" c="dimmed">
           Weeks are always 7 days and months are always 30 days — not calendar arithmetic.
         </Text>
+
+        {!isEdit && (
+          <Checkbox
+            label="Start this task already due"
+            checked={startDue}
+            onChange={(event) => setStartDue(event.currentTarget.checked)}
+          />
+        )}
 
         <ThresholdPreview
           dueAfterSeconds={toSeconds(orZero(form.values.dueValue), form.values.dueUnit)}

@@ -1,4 +1,5 @@
 import crypto from 'node:crypto';
+import type { Band } from '../shared/urgency.js';
 import type { CompletionDto, TaskDto } from '../shared/types.js';
 import { db } from './db.js';
 
@@ -11,6 +12,7 @@ interface TaskRow {
   urgent_after_seconds: number;
   created_at: number;
   updated_at: number;
+  initial_state: Band | null;
 }
 
 interface CompletionRow {
@@ -41,6 +43,7 @@ function toTaskDto(
     createdAt: row.created_at,
     updatedAt: row.updated_at,
     lastCompletedAt: aggregate.lastCompletedAt,
+    initialState: row.initial_state,
     completionCount: aggregate.completionCount,
   };
 }
@@ -100,6 +103,7 @@ export interface CreateTaskParams {
   dueAfterSeconds: number;
   overdueAfterSeconds: number;
   urgentAfterSeconds: number;
+  initialState?: Band;
 }
 
 export function createTask(params: CreateTaskParams): TaskDto {
@@ -107,8 +111,8 @@ export function createTask(params: CreateTaskParams): TaskDto {
   const now = Date.now();
 
   db.prepare(
-    `INSERT INTO tasks (id, name, description, due_after_seconds, overdue_after_seconds, urgent_after_seconds, created_at, updated_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+    `INSERT INTO tasks (id, name, description, due_after_seconds, overdue_after_seconds, urgent_after_seconds, created_at, updated_at, initial_state)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
   ).run(
     id,
     params.name,
@@ -118,6 +122,7 @@ export function createTask(params: CreateTaskParams): TaskDto {
     params.urgentAfterSeconds,
     now,
     now,
+    params.initialState ?? null,
   );
 
   return getTask(id)!;
