@@ -39,11 +39,11 @@ const CADENCE_PRESETS: CadencePreset[] = [
 interface TaskFormValues {
   name: string;
   description: string;
-  dueValue: number;
+  dueValue: number | '';
   dueUnit: DurationUnit;
-  overdueValue: number;
+  overdueValue: number | '';
   overdueUnit: DurationUnit;
-  urgentValue: number;
+  urgentValue: number | '';
   urgentUnit: DurationUnit;
 }
 
@@ -81,6 +81,16 @@ function toNumber(value: number | string): number {
   return typeof value === 'number' ? value : Number(value) || 0;
 }
 
+// NumberInput reports '' when cleared; kept as '' in form state (rather than
+// coerced to 0) so the box goes empty instead of showing "0".
+function toFieldValue(value: number | string): number | '' {
+  return value === '' ? '' : toNumber(value);
+}
+
+function orZero(value: number | ''): number {
+  return value === '' ? 0 : value;
+}
+
 const API_FIELD_TO_FORM_FIELD: Record<string, keyof TaskFormValues> = {
   name: 'name',
   description: 'description',
@@ -91,7 +101,7 @@ const API_FIELD_TO_FORM_FIELD: Record<string, keyof TaskFormValues> = {
 
 interface ThresholdFieldProps {
   label: string;
-  value: number;
+  value: number | '';
   unit: DurationUnit;
   error?: string;
   onValueChange: (value: number | string) => void;
@@ -111,6 +121,7 @@ function ThresholdField({
       <NumberInput
         label={label}
         min={0}
+        placeholder="0"
         value={value}
         onChange={onValueChange}
         error={error}
@@ -158,15 +169,15 @@ function TaskFormFields({ task, onClose }: TaskFormFieldsProps) {
         errors.name = 'Name must be 200 characters or fewer';
       }
 
-      if (!(values.dueValue > 0)) errors.dueValue = 'Must be greater than 0';
-      if (!(values.overdueValue > 0)) errors.overdueValue = 'Must be greater than 0';
-      if (!(values.urgentValue > 0)) errors.urgentValue = 'Must be greater than 0';
+      if (!(orZero(values.dueValue) > 0)) errors.dueValue = 'Must be greater than 0';
+      if (!(orZero(values.overdueValue) > 0)) errors.overdueValue = 'Must be greater than 0';
+      if (!(orZero(values.urgentValue) > 0)) errors.urgentValue = 'Must be greater than 0';
 
       if (!errors.dueValue && !errors.overdueValue && !errors.urgentValue) {
         const issues = thresholdOrderingIssues({
-          dueAfterSeconds: toSeconds(values.dueValue, values.dueUnit),
-          overdueAfterSeconds: toSeconds(values.overdueValue, values.overdueUnit),
-          urgentAfterSeconds: toSeconds(values.urgentValue, values.urgentUnit),
+          dueAfterSeconds: toSeconds(orZero(values.dueValue), values.dueUnit),
+          overdueAfterSeconds: toSeconds(orZero(values.overdueValue), values.overdueUnit),
+          urgentAfterSeconds: toSeconds(orZero(values.urgentValue), values.urgentUnit),
         });
         for (const issue of issues) {
           errors[issue.path === 'overdueAfterSeconds' ? 'overdueValue' : 'urgentValue'] =
@@ -184,10 +195,12 @@ function TaskFormFields({ task, onClose }: TaskFormFieldsProps) {
   // fields — so each handler re-validates explicitly.
 
   function handleDueValueChange(value: number | string) {
-    const numeric = toNumber(value);
-    form.setFieldValue('dueValue', numeric);
-    if (!overdueTouched) form.setFieldValue('overdueValue', numeric * 2);
-    if (!urgentTouched) form.setFieldValue('urgentValue', numeric * 4);
+    const fieldValue = toFieldValue(value);
+    form.setFieldValue('dueValue', fieldValue);
+    if (fieldValue !== '') {
+      if (!overdueTouched) form.setFieldValue('overdueValue', fieldValue * 2);
+      if (!urgentTouched) form.setFieldValue('urgentValue', fieldValue * 4);
+    }
     form.validate();
   }
 
@@ -201,7 +214,7 @@ function TaskFormFields({ task, onClose }: TaskFormFieldsProps) {
 
   function handleOverdueValueChange(value: number | string) {
     setOverdueTouched(true);
-    form.setFieldValue('overdueValue', toNumber(value));
+    form.setFieldValue('overdueValue', toFieldValue(value));
     form.validate();
   }
 
@@ -214,7 +227,7 @@ function TaskFormFields({ task, onClose }: TaskFormFieldsProps) {
 
   function handleUrgentValueChange(value: number | string) {
     setUrgentTouched(true);
-    form.setFieldValue('urgentValue', toNumber(value));
+    form.setFieldValue('urgentValue', toFieldValue(value));
     form.validate();
   }
 
@@ -241,9 +254,9 @@ function TaskFormFields({ task, onClose }: TaskFormFieldsProps) {
     const input = {
       name: values.name.trim(),
       description: values.description,
-      dueAfterSeconds: toSeconds(values.dueValue, values.dueUnit),
-      overdueAfterSeconds: toSeconds(values.overdueValue, values.overdueUnit),
-      urgentAfterSeconds: toSeconds(values.urgentValue, values.urgentUnit),
+      dueAfterSeconds: toSeconds(orZero(values.dueValue), values.dueUnit),
+      overdueAfterSeconds: toSeconds(orZero(values.overdueValue), values.overdueUnit),
+      urgentAfterSeconds: toSeconds(orZero(values.urgentValue), values.urgentUnit),
     };
 
     const promise =
@@ -318,9 +331,9 @@ function TaskFormFields({ task, onClose }: TaskFormFieldsProps) {
         </Text>
 
         <ThresholdPreview
-          dueAfterSeconds={toSeconds(form.values.dueValue, form.values.dueUnit)}
-          overdueAfterSeconds={toSeconds(form.values.overdueValue, form.values.overdueUnit)}
-          urgentAfterSeconds={toSeconds(form.values.urgentValue, form.values.urgentUnit)}
+          dueAfterSeconds={toSeconds(orZero(form.values.dueValue), form.values.dueUnit)}
+          overdueAfterSeconds={toSeconds(orZero(form.values.overdueValue), form.values.overdueUnit)}
+          urgentAfterSeconds={toSeconds(orZero(form.values.urgentValue), form.values.urgentUnit)}
         />
 
         <Group justify="flex-end">
